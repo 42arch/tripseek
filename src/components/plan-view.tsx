@@ -35,18 +35,32 @@ function PlanView(plan: Plan) {
             <ArrowLeftIcon />
           </Button>
         </div>
-        <div className='flex flex-col overflow-y-auto'>
+        <div className='flex h-[calc(100%-60px)] flex-col overflow-y-auto'>
           <div className='border-b-4 border-black px-4 py-2 text-sm'>
             {plan.summary}
           </div>
-          <div className='flex flex-col px-4 py-2 text-sm'>
+          <div
+            className='flex flex-col px-4 py-2 text-sm'
+            onMouseEnter={(e) => {
+              console.log(e)
+            }}
+          >
             {plan.itinerary.map((item, idx) => (
-              <div className='h-40 border-b border-black pb-2 pt-1' key={idx}>
-                <h4 className='text-lg'>
+              <div
+                className='h-auto cursor-pointer border-b border-black px-1 pb-4 pt-2 hover:bg-main'
+                key={idx}
+              >
+                <h4 className='my-1 text-lg font-semibold'>
                   {item.day} - {item.destination}
                 </h4>
-                <div>{item.description}</div>
-                <div>当天预算：{item.budget}元</div>
+                <div className='mt-2 text-sm text-secondaryBlack'>
+                  <div>{item.description}</div>
+                  <div>当天预算：{item.budget}元</div>
+                  <div>交通工具：{item.transportation}</div>
+                  <div>
+                    景点：{item.attractions.map((i) => i.name).join(',')}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

@@ -7,7 +7,7 @@ export const planSchema = z.object({
       day: z.string(),
       from: z.string(),
       destination: z.string(),
-      coordinates: z.array(z.number(), z.number()),
+      coordinates: z.tuple([z.number(), z.number()]),
       description: z.string(),
       transportation: z.string(),
       budget: z.number(),
@@ -15,7 +15,7 @@ export const planSchema = z.object({
         z.object({
           name: z.string(),
           description: z.string(),
-          coordinates: z.array(z.number(), z.number())
+          coordinates: z.tuple([z.number(), z.number()])
         })
       )
     })

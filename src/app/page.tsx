@@ -1,4 +1,3 @@
-import { usePlanStore } from '@/store'
 import CreatePlan from './create-plan'
 import PlanContainer from './plan-container'
 
@@ -9,7 +8,7 @@ export default async function IndexPage() {
         <CreatePlan />
       </section>
 
-      <section className='h-[calc(100%-32px-44px)] w-full'>
+      <section className='mb-4 h-[calc(100%-32px-44px-16px)] w-full'>
         <PlanContainer />
       </section>
     </div>
