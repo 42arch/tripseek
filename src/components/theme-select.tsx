@@ -12,7 +12,7 @@ export default function ThemeSwitch() {
 
   return (
     <Button
-      variant='ghost'
+      variant='neutral'
       size='icon'
       onClick={() => {
         if (theme === 'light') {
