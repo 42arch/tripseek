@@ -33,6 +33,7 @@ import {
 import { useMutation } from '@tanstack/react-query'
 import { Plan } from '@/types'
 import { usePlanStore } from '@/store'
+import { useState } from 'react'
 
 const formSchema = z.object({
   departure: z
@@ -62,6 +63,7 @@ const fetchPlan = async (params: FormParam) => {
 }
 
 function CreatePlan() {
+  const [formOpen, toggleFormOpen] = useState(false)
   const { setPlan } = usePlanStore()
   const form = useForm<FormParam>({
     resolver: zodResolver(formSchema),
@@ -83,112 +85,122 @@ function CreatePlan() {
     onSuccess: (data) => {
       const planData = JSON.parse(data) as Plan
       setPlan(planData)
+      toggleFormOpen(false)
     }
   })
 
   return (
-    <Dialog>
+    <Dialog open={formOpen} onOpenChange={toggleFormOpen}>
       <DialogTrigger asChild>
         <Button size='lg' variant='default'>
           创建旅行计划
         </Button>
       </DialogTrigger>
 
-      <DialogContent className='sm:max-w-[425px]'>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <DialogHeader>
-              <DialogTitle>创建您的旅行计划</DialogTitle>
-              <DialogDescription>
-                在下方输入您的信息，让AI来为您生成旅行计划！
-              </DialogDescription>
-            </DialogHeader>
+      <DialogContent className='min-h-[400px] sm:max-w-[425px]'>
+        {!isPending ? (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <DialogHeader>
+                <DialogTitle>创建您的旅行计划</DialogTitle>
+                <DialogDescription>
+                  在下方输入您的信息，让AI来为您生成旅行计划！
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className='mt-4 grid w-full items-center gap-2'>
-              <FormField
-                control={form.control}
-                name='departure'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>出发地</FormLabel>
-                    <FormControl>
-                      <Input placeholder='您所在的地方' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>输入你出发的地方.</FormDescription> */}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='budget'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>预算</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='您计划的预算, 不填则不限'
-                        type='number'
-                        min={0}
-                        step={100}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='duration'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>旅行时长</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='您计划的旅行时长, 不填则不限'
-                        type='number'
-                        step={0.5}
-                        min={0}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='personNumber'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>人数</FormLabel>
-                    <FormControl>
-                      <Select {...field}>
-                        <SelectTrigger className='bg-bw text-text' id='person'>
-                          <SelectValue placeholder='选择' />
-                        </SelectTrigger>
-                        <SelectContent position='popper'>
-                          <SelectItem value='solo'>单人</SelectItem>
-                          <SelectItem value='duo'>双人</SelectItem>
-                          <SelectItem value='family'>家庭</SelectItem>
-                          <SelectItem value='group'>跟团</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+              <div className='mt-4 grid w-full items-center gap-2'>
+                <FormField
+                  control={form.control}
+                  name='departure'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>出发地</FormLabel>
+                      <FormControl>
+                        <Input placeholder='您所在的地方' {...field} />
+                      </FormControl>
+                      {/* <FormDescription>输入你出发的地方.</FormDescription> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='budget'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>预算</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='您计划的预算, 不填则不限'
+                          type='number'
+                          min={0}
+                          step={100}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='duration'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>旅行时长</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='您计划的旅行时长, 不填则不限'
+                          type='number'
+                          step={0.5}
+                          min={0}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='personNumber'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>人数</FormLabel>
+                      <FormControl>
+                        <Select {...field}>
+                          <SelectTrigger
+                            className='bg-bw text-text'
+                            id='person'
+                          >
+                            <SelectValue placeholder='选择' />
+                          </SelectTrigger>
+                          <SelectContent position='popper'>
+                            <SelectItem value='solo'>单人</SelectItem>
+                            <SelectItem value='duo'>双人</SelectItem>
+                            <SelectItem value='family'>家庭</SelectItem>
+                            <SelectItem value='group'>跟团</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <DialogFooter className='mt-4 w-full'>
-              <Button type='submit' className='w-full'>
-                生成
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              <DialogFooter className='mt-4 w-full'>
+                <Button type='submit' className='w-full'>
+                  生成
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        ) : (
+          <div className='flex h-full w-full items-center justify-center bg-bg'>
+            AI正在生成计划中，请稍等...
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

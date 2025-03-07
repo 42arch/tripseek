@@ -3,6 +3,7 @@ import { Button } from './ui/button'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Plan } from '@/types'
+import { ScrollArea, ScrollBar } from './ui/scroll-area'
 
 function PlanView(plan: Plan) {
   const [infoOpen, toggleInfoOpen] = useState(true)
@@ -36,34 +37,32 @@ function PlanView(plan: Plan) {
           </Button>
         </div>
         <div className='flex h-[calc(100%-60px)] flex-col overflow-y-auto'>
-          <div className='border-b-4 border-black px-4 py-2 text-sm'>
-            {plan.summary}
-          </div>
-          <div
-            className='flex flex-col px-4 py-2 text-sm'
-            onMouseEnter={(e) => {
-              console.log(e)
-            }}
-          >
-            {plan.itinerary.map((item, idx) => (
-              <div
-                className='h-auto cursor-pointer border-b border-black px-1 pb-4 pt-2 hover:bg-main'
-                key={idx}
-              >
-                <h4 className='my-1 text-lg font-semibold'>
-                  {item.day} - {item.destination}
-                </h4>
-                <div className='mt-2 text-sm text-secondaryBlack'>
-                  <div>{item.description}</div>
-                  <div>当天预算：{item.budget}元</div>
-                  <div>交通工具：{item.transportation}</div>
-                  <div>
-                    景点：{item.attractions.map((i) => i.name).join(',')}
+          <ScrollArea className='' type='always'>
+            <div className='border-b-4 border-black px-4 py-2 text-sm'>
+              {plan.summary}
+            </div>
+            <div className='flex flex-col px-4 py-2 text-sm'>
+              {plan.itinerary.map((item, idx) => (
+                <div
+                  className='h-auto cursor-pointer border-b border-black px-1 pb-4 pt-2 hover:bg-main'
+                  key={idx}
+                >
+                  <h4 className='my-1 text-lg font-semibold'>
+                    {item.day} - {item.destination}
+                  </h4>
+                  <div className='mt-2 text-sm text-secondaryBlack'>
+                    <div>{item.description}</div>
+                    <div>当天预算：{item.budget}元</div>
+                    <div>交通工具：{item.transportation}</div>
+                    <div>
+                      景点：{item.attractions.map((i) => i.name).join(',')}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <ScrollBar orientation='horizontal' />
+          </ScrollArea>
         </div>
       </div>
     </>
