@@ -11,7 +11,6 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -20,7 +19,6 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
@@ -31,24 +29,12 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { useMutation } from '@tanstack/react-query'
-import { Plan } from '@/types'
+import { FormParam, formSchema, Plan } from '@/types'
 import { usePlanStore } from '@/store'
 import { useState } from 'react'
-
-const formSchema = z.object({
-  departure: z
-    .string()
-    .min(1, {
-      message: '必须输入出发地！'
-    })
-    .max(50)
-    .nonempty(),
-  budget: z.coerce.number().min(0),
-  duration: z.coerce.number().min(0),
-  personNumber: z.enum(['solo', 'duo', 'family', 'group'])
-})
-
-type FormParam = z.infer<typeof formSchema>
+import { Textarea } from '@/components/ui/textarea'
+import { Sparkles } from 'lucide-react'
+import { Loading } from '@/components/loading'
 
 const fetchPlan = async (params: FormParam) => {
   const res = await fetch('/api/plan', {
@@ -69,9 +55,11 @@ function CreatePlan() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       departure: '',
+      destination: '',
       budget: 0,
       duration: 0,
-      personNumber: 'solo'
+      personNumber: 'solo',
+      ps: ''
     }
   })
 
@@ -92,7 +80,8 @@ function CreatePlan() {
   return (
     <Dialog open={formOpen} onOpenChange={toggleFormOpen}>
       <DialogTrigger asChild>
-        <Button size='lg' variant='default'>
+        <Button size='default' variant='default'>
+          <Sparkles size={18} />
           创建旅行计划
         </Button>
       </DialogTrigger>
@@ -102,9 +91,9 @@ function CreatePlan() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
               <DialogHeader>
-                <DialogTitle>创建您的旅行计划</DialogTitle>
+                <DialogTitle>创建旅行计划</DialogTitle>
                 <DialogDescription>
-                  在下方输入您的信息，让AI来为您生成旅行计划！
+                  在下方输入信息，让AI来为您生成旅行计划！
                 </DialogDescription>
               </DialogHeader>
 
@@ -116,7 +105,24 @@ function CreatePlan() {
                     <FormItem>
                       <FormLabel>出发地</FormLabel>
                       <FormControl>
-                        <Input placeholder='您所在的地方' {...field} />
+                        <Input placeholder='必填项，您所在的地方' {...field} />
+                      </FormControl>
+                      {/* <FormDescription>输入你出发的地方.</FormDescription> */}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='destination'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>目的地</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='不填的话则没有限制，交给AI决定'
+                          {...field}
+                        />
                       </FormControl>
                       {/* <FormDescription>输入你出发的地方.</FormDescription> */}
                       <FormMessage />
@@ -128,10 +134,10 @@ function CreatePlan() {
                   name='budget'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>预算</FormLabel>
+                      <FormLabel>预算（元）</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder='您计划的预算, 不填则不限'
+                          placeholder='不填的话则没有限制，交给AI决定'
                           type='number'
                           min={0}
                           step={100}
@@ -147,10 +153,10 @@ function CreatePlan() {
                   name='duration'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>旅行时长</FormLabel>
+                      <FormLabel>时长（天）</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder='您计划的旅行时长, 不填则不限'
+                          placeholder='不填的话则没有限制，交给AI决定'
                           type='number'
                           step={0.5}
                           min={0}
@@ -168,7 +174,10 @@ function CreatePlan() {
                     <FormItem>
                       <FormLabel>人数</FormLabel>
                       <FormControl>
-                        <Select {...field}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <SelectTrigger
                             className='bg-bw text-text'
                             id='person'
@@ -176,12 +185,28 @@ function CreatePlan() {
                             <SelectValue placeholder='选择' />
                           </SelectTrigger>
                           <SelectContent position='popper'>
-                            <SelectItem value='solo'>单人</SelectItem>
-                            <SelectItem value='duo'>双人</SelectItem>
-                            <SelectItem value='family'>家庭</SelectItem>
-                            <SelectItem value='group'>跟团</SelectItem>
+                            <SelectItem value='solo'>单人出行</SelectItem>
+                            <SelectItem value='duo'>双人出行</SelectItem>
+                            <SelectItem value='family'>家庭出行</SelectItem>
+                            <SelectItem value='group'>组团出行</SelectItem>
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='ps'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>补充</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder='提供更多的信息，比如：想在周末出行，偏好自然风光或者出国旅行等等'
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -191,14 +216,16 @@ function CreatePlan() {
 
               <DialogFooter className='mt-4 w-full'>
                 <Button type='submit' className='w-full'>
+                  <Sparkles size={14} />
                   生成
                 </Button>
               </DialogFooter>
             </form>
           </Form>
         ) : (
-          <div className='flex h-full w-full items-center justify-center bg-bg'>
-            AI正在生成计划中，请稍等...
+          <div className='flex h-full w-full flex-col items-center justify-center bg-bg'>
+            <Loading />
+            <p className='pt-4'>AI 正在生成计划中，请稍等...</p>
           </div>
         )}
       </DialogContent>

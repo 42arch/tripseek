@@ -9,16 +9,17 @@ import Map, {
 } from 'react-map-gl/mapbox'
 import { usePlanStore } from '@/store'
 import { useEffect, useMemo, useState } from 'react'
-import { Plan } from '@/types'
+import { Attraction, Plan } from '@/types'
 import { lineString, points } from '@turf/helpers'
-import { bezierSpline, bbox } from '@turf/turf'
+import { bbox, buffer } from '@turf/turf'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
+import MapControl from './map-control'
 
 type Location = {
   name: string
-  coordinates: number[]
+  coordinates: [number, number]
   itinerary: Plan['itinerary']
 }
 
@@ -34,9 +35,11 @@ const pathStyle: LineLayerSpecification = {
 }
 
 function MapScene() {
-  const { plan } = usePlanStore()
+  const { plan, currentItinerary } = usePlanStore()
   const { map } = useMap()
   const [popupInfo, setPopupInfo] = useState<Location | null>(null)
+  const [attractions, setAttractions] = useState<Attraction[]>([])
+  const [attractionInfo, setAttactionInfo] = useState<Attraction | null>(null)
 
   const locations = useMemo(() => {
     const locs: Location[] = []
@@ -71,14 +74,11 @@ function MapScene() {
       })
 
       const line = lineString(points)
-      // return bezierSpline(line)
       return line
     } else {
       return null
     }
   }, [plan])
-
-  console.log('path', path)
 
   useEffect(() => {
     if (!locations || !locations.length) return
@@ -88,20 +88,40 @@ function MapScene() {
     map?.fitBounds([minLng, minLat, maxLng, maxLat], {
       padding: 100
     })
-  }, [locations, map])
+
+    if (currentItinerary) {
+      const attPoints = currentItinerary.attractions.length
+        ? currentItinerary.attractions.map((att) => att.coordinates)
+        : [currentItinerary.coordinates]
+
+      setAttractions(currentItinerary.attractions)
+      const area = buffer(points(attPoints), 2, {
+        units: 'kilometers'
+      })
+      if (area) {
+        const [minLng, minLat, maxLng, maxLat] = bbox(area)
+        map?.fitBounds([minLng, minLat, maxLng, maxLat], {
+          padding: 100
+        })
+      }
+    }
+  }, [locations, map, currentItinerary])
 
   return (
     <Map
       id='map'
-      mapboxAccessToken='pk.eyJ1IjoiaW5nZW40MiIsImEiOiJjazlsMnliMXoyMWoxM2tudm1hajRmaHZ6In0.rWx_wAz2cAeMIzxQQfPDPA'
+      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       initialViewState={{
         longitude: 120,
         latitude: 30,
         zoom: 4
       }}
-      onClick={() => setPopupInfo(null)}
+      onClick={() => {
+        setPopupInfo(null)
+        setAttactionInfo(null)
+      }}
       style={{ width: '100%', height: '100%' }}
-      mapStyle='mapbox://styles/mapbox/streets-v9'
+      mapStyle='mapbox://styles/mapbox/standard'
     >
       {locations.map((item, idx) => (
         <Marker
@@ -112,7 +132,7 @@ function MapScene() {
           }}
           longitude={item.coordinates[0]}
           latitude={item.coordinates[1]}
-          anchor='center'
+          anchor='bottom'
           onClick={(e) => {
             e.originalEvent.stopPropagation()
             setPopupInfo(item)
@@ -135,7 +155,6 @@ function MapScene() {
               <CardTitle>{popupInfo.name}</CardTitle>
             </CardHeader>
             <CardContent className='w-48 overflow-x-auto p-0'>
-              {/* <div className='scrollbar flex'> */}
               <ScrollArea className='' type='always'>
                 <div className='flex'>
                   {popupInfo.itinerary.map((item, idx) => (
@@ -147,10 +166,13 @@ function MapScene() {
                       <p className='mt-1 text-xs text-secondaryBlack'>
                         {item.description}
                       </p>
-                      <p className=' text-secondaryBlack'>
-                        推荐景点：
-                        {item.attractions.map((at, i) => `${at.name}，`)}
-                      </p>
+                      {item.attractions.length ? (
+                        <p className=' text-secondaryBlack'>
+                          推荐景点：
+                          {item.attractions.map((i) => i.name).join('，')}
+                        </p>
+                      ) : null}
+
                       {/* <a className='py-1 text-right text-secondaryBlack'>
                         详细
                       </a> */}
@@ -160,8 +182,49 @@ function MapScene() {
 
                 <ScrollBar orientation='horizontal' />
               </ScrollArea>
-
-              {/* </div> */}
+            </CardContent>
+          </Card>
+        </Popup>
+      )}
+      {attractions.map((item, idx) => (
+        <Marker
+          key={idx}
+          style={{
+            width: '30px',
+            height: '30px',
+            cursor: 'pointer'
+          }}
+          longitude={item.coordinates[0]}
+          latitude={item.coordinates[1]}
+          anchor='bottom'
+          onClick={(e) => {
+            console.log(222222, item)
+            e.originalEvent.stopPropagation()
+            setAttactionInfo(item)
+          }}
+        >
+          <img src='/attraction.png' />
+        </Marker>
+      ))}
+      {attractionInfo && (
+        <Popup
+          anchor='bottom'
+          className='z-30'
+          longitude={attractionInfo.coordinates[0]}
+          latitude={attractionInfo.coordinates[1]}
+          onClose={() => setAttactionInfo(null)}
+          closeButton={false}
+        >
+          <Card className='bg-bg p-2'>
+            <CardHeader className='p-2'>
+              <CardTitle className='text-base'>
+                景点: {attractionInfo.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='w-48 overflow-x-auto p-0'>
+              <p className='p-2 pt-0 text-xs text-secondaryBlack'>
+                {attractionInfo.description}
+              </p>
             </CardContent>
           </Card>
         </Popup>
@@ -179,6 +242,7 @@ function MapView() {
   return (
     <MapProvider>
       <MapScene />
+      <MapControl />
     </MapProvider>
   )
 }

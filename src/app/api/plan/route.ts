@@ -1,22 +1,45 @@
 import { OpenAI } from 'openai'
 import { NextResponse } from 'next/server'
+import { FormParam } from '@/types'
 
 const openai = new OpenAI({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY
 })
 
+const getPersonNumber = (personNumber: FormParam['personNumber']) => {
+  switch (personNumber) {
+    case 'solo':
+      return '单人'
+    case 'duo':
+      return '双人'
+    case 'family':
+      return '家庭，三人以上'
+    case 'group':
+      return '组团，四人以上'
+  }
+}
+
 export async function POST(request: Request, context: any) {
   try {
     const body = await request.json()
-    const { budget, duration, preferences, departure, destination } = body
+    const {
+      budget,
+      duration,
+      preferences,
+      departure,
+      destination,
+      personNumber,
+      ps
+    } = body
     const prompt = `作为一个旅游规划专家，请根据以下条件制定旅游计划：
     出发地：${departure},
     目的地：${destination},
     预算：${budget}
-    时长：${duration}
-    偏好：${preferences}
-    
+    时长：${duration},
+    偏好：${preferences},
+    人数：${getPersonNumber(personNumber)},
+    补充说明：${ps}
     请提供详细的旅游建议。
     `
 

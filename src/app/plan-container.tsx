@@ -8,10 +8,8 @@ import { usePlanStore } from '@/store'
 function PlanContainer() {
   const { plan } = usePlanStore()
 
-  console.log('plan data', plan)
-
   return (
-    <Card className='relative h-full w-full border-4'>
+    <Card className='relative h-full w-full border-4 bg-bg'>
       {plan && <PlanView {...plan} />}
       <MapView />
     </Card>

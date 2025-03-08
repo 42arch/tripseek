@@ -15,7 +15,7 @@ dependencies:
     specifier: ^1.0.7
     version: 1.0.7(next@14.2.15)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-accordion':
-    specifier: ^1.2.2
+    specifier: ^1.2.3
     version: 1.2.3(@types/react-dom@18.2.13)(@types/react@18.2.28)(react-dom@18.2.0)(react@18.2.0)
   '@radix-ui/react-aspect-ratio':
     specifier: ^1.1.1
@@ -92,9 +92,6 @@ dependencies:
   mapbox-gl:
     specifier: ^3.10.0
     version: 3.10.0
-  nanoid:
-    specifier: ^5.0.9
-    version: 5.1.0
   next:
     specifier: 14.2.15
     version: 14.2.15(react-dom@18.2.0)(react@18.2.0)
@@ -6664,12 +6661,6 @@ packages:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
-
-  /nanoid@5.1.0:
-    resolution: {integrity: sha512-zDAl/llz8Ue/EblwSYwdxGBYfj46IM1dhjVi8dyp9LQffoIGxJEAHj2oeZ4uNcgycSRcQ83CnfcZqEJzVDLcDw==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-    dev: false
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
