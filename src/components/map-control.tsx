@@ -1,6 +1,8 @@
+'use client'
+
 import { Minus, Plus } from 'lucide-react'
 import { Button } from './ui/button'
-import { useMap } from 'react-map-gl/mapbox'
+import { useMap } from 'react-map-gl/maplibre'
 
 function MapControl() {
   const { map } = useMap()

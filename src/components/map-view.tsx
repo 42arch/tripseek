@@ -6,22 +6,24 @@ import Map, {
   Popup,
   Source,
   useMap
-} from 'react-map-gl/mapbox'
+} from 'react-map-gl/maplibre'
 import { usePlanStore } from '@/store'
 import { useEffect, useMemo, useState } from 'react'
 import { Attraction, Plan } from '@/types'
 import { lineString, points } from '@turf/helpers'
 import { bbox, buffer } from '@turf/turf'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import 'mapbox-gl/dist/mapbox-gl.css'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
 import MapControl from './map-control'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 type Location = {
   name: string
   coordinates: [number, number]
   itinerary: Plan['itinerary']
 }
+
+const mapToken = process.env.NEXT_PUBLIC_MAP_TOKEN
 
 const pathStyle: LineLayerSpecification = {
   id: 'path',
@@ -110,7 +112,7 @@ function MapScene() {
   return (
     <Map
       id='map'
-      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+      // mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       initialViewState={{
         longitude: 120,
         latitude: 30,
@@ -121,7 +123,7 @@ function MapScene() {
         setAttactionInfo(null)
       }}
       style={{ width: '100%', height: '100%' }}
-      mapStyle='mapbox://styles/mapbox/standard'
+      mapStyle={`https://basemaps-api.arcgis.com/arcgis/rest/services/styles/OSM:LightGray?type=style&token=${mapToken}`}
     >
       {locations.map((item, idx) => (
         <Marker
