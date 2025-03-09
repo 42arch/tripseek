@@ -9,8 +9,8 @@ export const formSchema = z.object({
     .max(50)
     .nonempty(),
   destination: z.string(),
-  budget: z.coerce.number().min(0),
-  duration: z.coerce.number().min(0),
+  budget: z.coerce.number().optional(),
+  duration: z.coerce.number().optional(),
   personNumber: z.enum(['solo', 'duo', 'family', 'group']),
   ps: z.string()
 })

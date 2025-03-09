@@ -3,7 +3,6 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import { cn } from '@/lib/utils'
 import { Metadata } from 'next'
-import { ThemeProvider } from '@/components/theme-provider'
 import { OpenPanelComponent } from '@openpanel/nextjs'
 import { Analytics } from '@vercel/analytics/react'
 import Providers from './provides'
@@ -33,11 +32,11 @@ const fontSans = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'AI Trip Planner',
-  description: 'Starllow Lab, We build creative webapps and tools.',
-  keywords: ['AI旅行规划师'],
+  title: 'TripSeek',
+  description: '由 ChatGPT 和 DeepSeek 驱动的 AI 旅行规划师。',
+  keywords: ['AI旅行规划师', 'TripSeek'],
   icons:
-    "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌠</text></svg>"
+    "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏞️</text></svg>"
 }
 
 export default async function LocaleLayout({
@@ -56,21 +55,14 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className='bg-background h-full overflow-x-hidden bg-[radial-gradient(#80808080_1px,transparent_1px)] antialiased [background-size:24px_24px]'>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider messages={messages}>
-            <Providers>
-              <SiteHeader />
-              <main className='relative h-[calc(100%-64px)] w-full'>
-                {children}
-              </main>
-            </Providers>
-          </NextIntlClientProvider>
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>
+            <SiteHeader />
+            <main className='relative h-[calc(100%-64px)] w-full'>
+              {children}
+            </main>
+          </Providers>
+        </NextIntlClientProvider>
         <OpenPanelComponent
           clientId={opClientId || ''}
           trackScreenViews={true}

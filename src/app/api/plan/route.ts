@@ -23,23 +23,14 @@ const getPersonNumber = (personNumber: FormParam['personNumber']) => {
 export async function POST(request: Request, context: any) {
   try {
     const body = await request.json()
-    const {
-      budget,
-      duration,
-      preferences,
-      departure,
-      destination,
-      personNumber,
-      ps
-    } = body
+    const { budget, duration, departure, destination, personNumber, ps } = body
     const prompt = `作为一个旅游规划专家，请根据以下条件制定旅游计划：
     出发地：${departure},
     目的地：${destination},
-    预算：${budget}
-    时长：${duration},
-    偏好：${preferences},
+    预算：${budget ? budget + '元' : '不限'}
+    时长：${duration ? duration + '天' : '不限'},
     人数：${getPersonNumber(personNumber)},
-    补充说明：${ps}
+    补充说明：${ps}。
     请提供详细的旅游建议。
     `
 
@@ -89,7 +80,7 @@ export async function POST(request: Request, context: any) {
       return NextResponse.json(
         {
           error:
-            '区域访问限制：请确保您的OpenAI API密钥可以在当前区域使用，或考虑使用代理服务器。'
+            '区域访问限制：请确保您的 API密钥可以在当前区域使用，或考虑使用代理服务器。'
         },
         {
           status: 403
@@ -100,7 +91,7 @@ export async function POST(request: Request, context: any) {
     if (error?.code === 'ECONNREFUSED') {
       return NextResponse.json(
         {
-          error: '无法连接到OpenAI服务：请检查您的网络连接或代理设置。'
+          error: '无法连接到AI服务：请检查您的网络连接或代理设置。'
         },
         {
           status: 503

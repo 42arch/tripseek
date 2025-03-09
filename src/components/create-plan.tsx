@@ -56,8 +56,8 @@ function CreatePlan() {
     defaultValues: {
       departure: '',
       destination: '',
-      budget: 0,
-      duration: 0,
+      budget: undefined,
+      duration: undefined,
       personNumber: 'solo',
       ps: ''
     }
@@ -74,6 +74,9 @@ function CreatePlan() {
       const planData = JSON.parse(data) as Plan
       setPlan(planData)
       toggleFormOpen(false)
+    },
+    onError: (error) => {
+      console.error(error)
     }
   })
 
@@ -107,7 +110,6 @@ function CreatePlan() {
                       <FormControl>
                         <Input placeholder='必填项，您所在的地方' {...field} />
                       </FormControl>
-                      {/* <FormDescription>输入你出发的地方.</FormDescription> */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -124,7 +126,6 @@ function CreatePlan() {
                           {...field}
                         />
                       </FormControl>
-                      {/* <FormDescription>输入你出发的地方.</FormDescription> */}
                       <FormMessage />
                     </FormItem>
                   )}
